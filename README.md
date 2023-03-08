@@ -15,7 +15,8 @@ module "gitlab_oidc" {
   source  = "bryan-rhm/gitlab-oidc/aws"
   version = "choose the version you need"
 
-  gitlab_organization = "YOUR ORGANIZATION/GITLAB ACCOUNT"
+  gitlab_organization = "YOUR ORGANIZATION OR GITLAB ACCOUNT"
+  gitlab_repositories = ["*"] # Repositories you want to allow access to AWS, default all repositories inside the organization.
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"] # Policies you want to attach to the pipeline role.
 
 }
@@ -29,9 +30,12 @@ Once you have installed the module you will be able authenticate from your gitla
 After you configure the OIDC and role, the GitLab CI/CD job can retrieve a temporary credential from AWS Security Token Service (STS).
 
 ```yaml
-assume role:
+assume-role-example:
+  image: 
+    name: amazon/aws-cli:latest
+    entrypoint: [""]
   script:
-    - >
+   - >
       STS=($(aws sts assume-role-with-web-identity
       --role-arn ${ROLE_ARN}
       --role-session-name "GitLabRunner-${CI_PROJECT_ID}-${CI_PIPELINE_ID}"
@@ -87,6 +91,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_gitlab_organization"></a> [gitlab\_organization](#input\_gitlab\_organization) | The Gitlab organization/account to allow access to AWS | `string` | n/a | yes |
 | <a name="input_gitlab_repositories"></a> [gitlab\_repositories](#input\_gitlab\_repositories) | The Gitlab repositories inside the organization/account you want to allow access to AWS, default all repositories inside the organization | `list(string)` | <pre>[<br>  "*"<br>]</pre> | no |
+| <a name="input_gitlab_tls_url"></a> [gitlab\_tls\_url](#input\_gitlab\_tls\_url) | The TLS URL of the Gitlab provider | `string` | `"tls://gitlab.com:443"` | no |
 | <a name="input_gitlab_url"></a> [gitlab\_url](#input\_gitlab\_url) | The URL of the Gitlab provider | `string` | `"https://gitlab.com"` | no |
 | <a name="input_managed_policy_arns"></a> [managed\_policy\_arns](#input\_managed\_policy\_arns) | The ARNs of the managed policies to attach to the role | `list(string)` | `[]` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name of the IAM role | `string` | `"GitlabCIRole"` | no |
